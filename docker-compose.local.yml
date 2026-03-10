@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  # 내 노트북(Local) 연동 테스트 전용 가짜 DB
+  mysql-local:
+    image: mysql:8.0
+    container_name: mysql-local
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=afterbuy_db
+    networks:
+      - after-buy-network
+
+  # 각 서비스들이 위에서 만든 mysql-local을 바라보도록 설정 덮어쓰기
+  auth-service:
+    depends_on:
+      - mysql-local
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev # 로컬 통합망에서도 dev모드로 켜서 테스트 
+      - DB_URL=jdbc:mysql://mysql-local:3306/afterbuy_db?useSSL=false&allowPublicKeyRetrieval=true
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+
+  device-service:
+    depends_on:
+      - mysql-local
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - DB_URL=jdbc:mysql://mysql-local:3306/afterbuy_db?useSSL=false&allowPublicKeyRetrieval=true
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+
+  notification-service:
+    depends_on:
+      - mysql-local
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - DB_URL=jdbc:mysql://mysql-local:3306/afterbuy_db?useSSL=false&allowPublicKeyRetrieval=true
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+
+  admin-service:
+    depends_on:
+      - mysql-local
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - DB_URL=jdbc:mysql://mysql-local:3306/afterbuy_db?useSSL=false&allowPublicKeyRetrieval=true
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
