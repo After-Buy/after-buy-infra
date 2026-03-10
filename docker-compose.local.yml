@@ -1,51 +1,32 @@
 version: '3.8'
 
 services:
-  # 내 노트북(Local) 연동 테스트 전용 가짜 DB
-  mysql-local:
-    image: mysql:8.0
-    container_name: mysql-local
-    ports:
-      - "3306:3306"
-    environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=afterbuy_db
-    networks:
-      - after-buy-network
-
-  # 각 서비스들이 위에서 만든 mysql-local을 바라보도록 설정 덮어쓰기
+  # 내 PC(운영체제)에 이미 직접 깔려있는 찐 로컬 MySQL을 바라보도록 설정 덮어쓰기
+  # 도커 안에서 내 PC로 구멍을 뚫고 나올 때는 'localhost'가 아니라 'host.docker.internal'을 씁니다!
   auth-service:
-    depends_on:
-      - mysql-local
     environment:
       - SPRING_PROFILES_ACTIVE=dev # 로컬 통합망에서도 dev모드로 켜서 테스트 
-      - DB_URL=jdbc:mysql://mysql-local:3306/afterbuy_db?useSSL=false&allowPublicKeyRetrieval=true
-      - DB_USERNAME=root
-      - DB_PASSWORD=root
+      - DB_URL=jdbc:mysql://host.docker.internal:3306/afterbuy_db?useSSL=false&allowPublicKeyRetrieval=true
+      - DB_USERNAME=root # (내 PC MySQL 아이디)
+      - DB_PASSWORD=root # (내 PC MySQL 비번)
 
   device-service:
-    depends_on:
-      - mysql-local
     environment:
       - SPRING_PROFILES_ACTIVE=dev
-      - DB_URL=jdbc:mysql://mysql-local:3306/afterbuy_db?useSSL=false&allowPublicKeyRetrieval=true
+      - DB_URL=jdbc:mysql://host.docker.internal:3306/device_db?useSSL=false&allowPublicKeyRetrieval=true
       - DB_USERNAME=root
       - DB_PASSWORD=root
 
   notification-service:
-    depends_on:
-      - mysql-local
     environment:
       - SPRING_PROFILES_ACTIVE=dev
-      - DB_URL=jdbc:mysql://mysql-local:3306/afterbuy_db?useSSL=false&allowPublicKeyRetrieval=true
+      - DB_URL=jdbc:mysql://host.docker.internal:3306/afterbuy_db?useSSL=false&allowPublicKeyRetrieval=true
       - DB_USERNAME=root
       - DB_PASSWORD=root
 
   admin-service:
-    depends_on:
-      - mysql-local
     environment:
       - SPRING_PROFILES_ACTIVE=dev
-      - DB_URL=jdbc:mysql://mysql-local:3306/afterbuy_db?useSSL=false&allowPublicKeyRetrieval=true
+      - DB_URL=jdbc:mysql://host.docker.internal:3306/afterbuy_db?useSSL=false&allowPublicKeyRetrieval=true
       - DB_USERNAME=root
       - DB_PASSWORD=root
