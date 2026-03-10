@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      # SSL 인증서가 배포되면 아래 주석을 해제하여 연동합니다.
+      # - ./certbot/conf:/etc/letsencrypt
+      # - ./certbot/www:/var/www/certbot
+    networks:
+      - after-buy-network
+    restart: always
+
+  auth-service:
+    image: ${DOCKER_USERNAME:-afterbuy}/auth-service:latest
+    container_name: auth-service
+    expose:
+      - "8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-dev}
+      - DB_URL=${JDBC_DATABASE_URL}
+      - DB_USERNAME=${JDBC_DATABASE_USERNAME}
+      - DB_PASSWORD=${JDBC_DATABASE_PASSWORD}
+    networks:
+      - after-buy-network
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  device-service:
+    image: ${DOCKER_USERNAME:-afterbuy}/device-service:latest
+    container_name: device-service
+    expose:
+      - "8082"
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-dev}
+      - DB_URL=${JDBC_DATABASE_URL}
+      - DB_USERNAME=${JDBC_DATABASE_USERNAME}
+      - DB_PASSWORD=${JDBC_DATABASE_PASSWORD}
+    networks:
+      - after-buy-network
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  notification-service:
+    image: ${DOCKER_USERNAME:-afterbuy}/notification-service:latest
+    container_name: notification-service
+    expose:
+      - "8083"
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-dev}
+      - DB_URL=${JDBC_DATABASE_URL}
+      - DB_USERNAME=${JDBC_DATABASE_USERNAME}
+      - DB_PASSWORD=${JDBC_DATABASE_PASSWORD}
+    networks:
+      - after-buy-network
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  admin-service:
+    image: ${DOCKER_USERNAME:-afterbuy}/admin-service:latest
+    container_name: admin-service
+    expose:
+      - "8084"
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-dev}
+      - DB_URL=${JDBC_DATABASE_URL}
+      - DB_USERNAME=${JDBC_DATABASE_USERNAME}
+      - DB_PASSWORD=${JDBC_DATABASE_PASSWORD}
+    networks:
+      - after-buy-network
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  after-buy-network:
+    driver: bridge
