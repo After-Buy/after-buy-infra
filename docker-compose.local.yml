@@ -5,28 +5,36 @@ services:
   # 도커 안에서 내 PC로 구멍을 뚫고 나올 때는 'localhost'가 아니라 'host.docker.internal'을 씁니다!
   auth-service:
     environment:
-      - SPRING_PROFILES_ACTIVE=dev # 로컬 통합망에서도 dev모드로 켜서 테스트 
-      - DB_URL=jdbc:mysql://host.docker.internal:3306/afterbuy_db?useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_PROFILES_ACTIVE=dev
+      - DB_HOST=host.docker.internal
+      - DB_PORT=3306
+      - DB_NAME=auth_db
       - DB_USERNAME=root # (내 PC MySQL 아이디)
       - DB_PASSWORD=root # (내 PC MySQL 비번)
 
   device-service:
     environment:
       - SPRING_PROFILES_ACTIVE=dev
-      - DB_URL=jdbc:mysql://host.docker.internal:3306/device_db?useSSL=false&allowPublicKeyRetrieval=true
+      - DB_HOST=host.docker.internal
+      - DB_PORT=3306
+      - DB_NAME=device_db
       - DB_USERNAME=root
       - DB_PASSWORD=root
 
   notification-service:
     environment:
       - SPRING_PROFILES_ACTIVE=dev
-      - DB_URL=jdbc:mysql://host.docker.internal:3306/afterbuy_db?useSSL=false&allowPublicKeyRetrieval=true
+      - DB_HOST=host.docker.internal
+      - DB_PORT=3306
+      - DB_NAME=notification_db
       - DB_USERNAME=root
       - DB_PASSWORD=root
 
   admin-service:
     environment:
       - SPRING_PROFILES_ACTIVE=dev
-      - DB_URL=jdbc:mysql://host.docker.internal:3306/afterbuy_db?useSSL=false&allowPublicKeyRetrieval=true
+      - DB_HOST=host.docker.internal
+      - DB_PORT=3306
+      - DB_NAME=admin_db
       - DB_USERNAME=root
       - DB_PASSWORD=root

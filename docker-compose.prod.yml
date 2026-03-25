@@ -3,13 +3,13 @@ version: '3.8'
 services:
   # Prod 서버에서는 모든 서비스가 :latest 태그(메인 브랜치 이미지)를 사용하도록 명시합니다.
   auth-service:
-    image: ${DOCKER_USERNAME:-afterbuy}/auth-service:latest
+    image: ghcr.io/${GITHUB_ORG:-after-buy}/after-buy-auth-service:latest
 
   device-service:
-    image: ${DOCKER_USERNAME:-afterbuy}/device-service:latest
+    image: ghcr.io/${GITHUB_ORG:-after-buy}/after-buy-device-service:latest
 
   notification-service:
-    image: ${DOCKER_USERNAME:-afterbuy}/notification-service:latest
+    image: ghcr.io/${GITHUB_ORG:-after-buy}/after-buy-notification-service:latest
 
   admin-service:
-    image: ${DOCKER_USERNAME:-afterbuy}/admin-service:latest
+    image: ghcr.io/${GITHUB_ORG:-after-buy}/after-buy-admin-service:latest

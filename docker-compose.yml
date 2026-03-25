@@ -15,17 +15,39 @@ services:
     networks:
       - after-buy-network
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   auth-service:
-    image: ${DOCKER_USERNAME:-afterbuy}/auth-service:latest
+    image: ghcr.io/${GITHUB_ORG:-after-buy}/after-buy-auth-service:latest
     container_name: auth-service
     expose:
       - "8081"
     environment:
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-dev}
-      - DB_URL=${JDBC_DATABASE_URL}
-      - DB_USERNAME=${JDBC_DATABASE_USERNAME}
-      - DB_PASSWORD=${JDBC_DATABASE_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=3306
+      - DB_NAME=auth_db
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      # JWT
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ACCESS_EXPIRATION=${JWT_ACCESS_EXPIRATION}
+      - JWT_REFRESH_EXPIRATION=${JWT_REFRESH_EXPIRATION}
+      # 카카오 OAuth
+      - KAKAO_CLIENT_ID=${KAKAO_CLIENT_ID}
+      - KAKAO_CLIENT_SECRET=${KAKAO_CLIENT_SECRET}
+      - KAKAO_REDIRECT_URI=${KAKAO_REDIRECT_URI}
+      # MSA 내부 통신
+      - INTERNAL_SECRET_KEY=${INTERNAL_SECRET_KEY}
+      # AWS S3
+      - AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
+      - AWS_SECRET_KEY=${AWS_SECRET_KEY}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
     networks:
       - after-buy-network
     restart: always
@@ -36,15 +58,29 @@ services:
         max-file: "3"
 
   device-service:
-    image: ${DOCKER_USERNAME:-afterbuy}/device-service:latest
+    image: ghcr.io/${GITHUB_ORG:-after-buy}/after-buy-device-service:latest
     container_name: device-service
     expose:
       - "8082"
     environment:
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-dev}
-      - DB_URL=${JDBC_DATABASE_URL}
-      - DB_USERNAME=${JDBC_DATABASE_USERNAME}
-      - DB_PASSWORD=${JDBC_DATABASE_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=3306
+      - DB_NAME=device_db
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      # JWT
+      - JWT_SECRET=${JWT_SECRET}
+      # MSA 내부 통신
+      - INTERNAL_SECRET_KEY=${INTERNAL_SECRET_KEY}
+      # 네이버 쇼핑 API
+      - NAVER_CLIENT_ID=${NAVER_CLIENT_ID}
+      - NAVER_CLIENT_SECRET=${NAVER_CLIENT_SECRET}
+      # AWS S3 + Lambda
+      - AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
+      - AWS_SECRET_KEY=${AWS_SECRET_KEY}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
     networks:
       - after-buy-network
     restart: always
@@ -55,15 +91,23 @@ services:
         max-file: "3"
 
   notification-service:
-    image: ${DOCKER_USERNAME:-afterbuy}/notification-service:latest
+    image: ghcr.io/${GITHUB_ORG:-after-buy}/after-buy-notification-service:latest
     container_name: notification-service
     expose:
       - "8083"
     environment:
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-dev}
-      - DB_URL=${JDBC_DATABASE_URL}
-      - DB_USERNAME=${JDBC_DATABASE_USERNAME}
-      - DB_PASSWORD=${JDBC_DATABASE_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=3306
+      - DB_NAME=notification_db
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      # JWT
+      - JWT_SECRET=${JWT_SECRET}
+      # MSA 내부 통신
+      - INTERNAL_SECRET_KEY=${INTERNAL_SECRET_KEY}
+      # Firebase FCM
+      - FIREBASE_CONFIG_PATH=${FIREBASE_CONFIG_PATH}
     networks:
       - after-buy-network
     restart: always
@@ -74,15 +118,21 @@ services:
         max-file: "3"
 
   admin-service:
-    image: ${DOCKER_USERNAME:-afterbuy}/admin-service:latest
+    image: ghcr.io/${GITHUB_ORG:-after-buy}/after-buy-admin-service:latest
     container_name: admin-service
     expose:
       - "8084"
     environment:
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-dev}
-      - DB_URL=${JDBC_DATABASE_URL}
-      - DB_USERNAME=${JDBC_DATABASE_USERNAME}
-      - DB_PASSWORD=${JDBC_DATABASE_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=3306
+      - DB_NAME=admin_db
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      # MSA 내부 통신
+      - INTERNAL_SECRET_KEY=${INTERNAL_SECRET_KEY}
+      # 관리자 프론트엔드 URL (CORS)
+      - ADMIN_FRONTEND_URL=${ADMIN_FRONTEND_URL}
     networks:
       - after-buy-network
     restart: always
