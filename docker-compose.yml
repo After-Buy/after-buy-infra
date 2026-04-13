@@ -108,6 +108,8 @@ services:
       - INTERNAL_SECRET_KEY=${INTERNAL_SECRET_KEY}
       # Firebase FCM
       - FIREBASE_CONFIG_PATH=${FIREBASE_CONFIG_PATH}
+    volumes:
+      - /home/ubuntu/firebase-service-account.json:/app/firebase-service-account.json:ro
     networks:
       - after-buy-network
     restart: always
