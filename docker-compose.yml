@@ -1,0 +1,159 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      # SSL 인증서가 배포되면 아래 주석을 해제하여 연동합니다.
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    networks:
+      - after-buy-network
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  auth-service:
+    image: ghcr.io/${GITHUB_ORG:-after-buy}/after-buy-auth-service:latest
+    expose:
+      - "8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-dev}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=3306
+      - DB_NAME=auth_db
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      # JWT
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ACCESS_EXPIRATION=${JWT_ACCESS_EXPIRATION}
+      - JWT_REFRESH_EXPIRATION=${JWT_REFRESH_EXPIRATION}
+      # 카카오 OAuth
+      - KAKAO_CLIENT_ID=${KAKAO_CLIENT_ID}
+      - KAKAO_CLIENT_SECRET=${KAKAO_CLIENT_SECRET}
+      - KAKAO_REDIRECT_URI=${KAKAO_REDIRECT_URI}
+      # MSA 내부 통신
+      - INTERNAL_SECRET_KEY=${INTERNAL_SECRET_KEY}
+      - SERVICES_DEVICE_URL=http://device-service:8082
+      - SERVICES_NOTIFICATION_URL=http://notification-service:8083
+      - SERVICES_ADMIN_URL=http://admin-service:8084
+      # AWS S3
+      - AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
+      - AWS_SECRET_KEY=${AWS_SECRET_KEY}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
+    networks:
+      - after-buy-network
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  device-service:
+    image: ghcr.io/${GITHUB_ORG:-after-buy}/after-buy-device-service:latest
+    expose:
+      - "8082"
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-dev}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=3306
+      - DB_NAME=device_db
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      # JWT
+      - JWT_SECRET=${JWT_SECRET}
+      # MSA 내부 통신
+      - INTERNAL_SECRET_KEY=${INTERNAL_SECRET_KEY}
+      - SERVICES_ADMIN_URL=http://admin-service:8084
+      # 네이버 쇼핑 API
+      - NAVER_CLIENT_ID=${NAVER_CLIENT_ID}
+      - NAVER_CLIENT_SECRET=${NAVER_CLIENT_SECRET}
+      # AWS S3 + Lambda
+      - AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
+      - AWS_SECRET_KEY=${AWS_SECRET_KEY}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
+      - AWS_LAMBDA_FUNCTION_URL=${AWS_LAMBDA_FUNCTION_URL}
+      # Google Vertex AI (네이버 쇼핑 결과 정제용)
+      - VERTEX_API_KEY=${VERTEX_API_KEY}
+    networks:
+      - after-buy-network
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  notification-service:
+    image: ghcr.io/${GITHUB_ORG:-after-buy}/after-buy-notification-service:latest
+    expose:
+      - "8083"
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-dev}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=3306
+      - DB_NAME=notification_db
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      # JWT
+      - JWT_SECRET=${JWT_SECRET}
+      # MSA 내부 통신
+      - INTERNAL_SECRET_KEY=${INTERNAL_SECRET_KEY}
+      - SERVICES_DEVICE_URL=http://device-service:8082
+      - SERVICES_ADMIN_URL=http://admin-service:8084
+      # Firebase FCM
+      - FIREBASE_CONFIG_PATH=${FIREBASE_CONFIG_PATH}
+    volumes:
+      - /home/ubuntu/firebase-service-account.json:/app/firebase-service-account.json:ro
+    networks:
+      - after-buy-network
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  admin-service:
+    image: ghcr.io/${GITHUB_ORG:-after-buy}/after-buy-admin-service:latest
+    expose:
+      - "8084"
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-dev}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=3306
+      - DB_NAME=admin_db
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      # MSA 내부 통신
+      - INTERNAL_SECRET_KEY=${INTERNAL_SECRET_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+      - AUTH_SERVICE_URL=http://auth-service:8081
+      - DEVICE_SERVICE_URL=http://device-service:8082
+      - NOTIFICATION_SERVICE_URL=http://notification-service:8083
+      # 관리자 프론트엔드 URL (CORS)
+      - ADMIN_FRONTEND_URL=${ADMIN_FRONTEND_URL}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
+    networks:
+      - after-buy-network
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  after-buy-network:
+    driver: bridge

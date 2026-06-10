@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  # Dev 환경에서는 모든 서비스가 :dev 태그(개발 브랜치 이미지)를 사용하도록 오버라이드 합니다.
+  # Dev DB 역시 로컬 도커가 아닌 별도의 원격 RDS(Dev 전용)를 참조합니다.
+  auth-service:
+    image: ghcr.io/${GITHUB_ORG:-after-buy}/after-buy-auth-service:dev
+
+  device-service:
+    image: ghcr.io/${GITHUB_ORG:-after-buy}/after-buy-device-service:dev
+
+  notification-service:
+    image: ghcr.io/${GITHUB_ORG:-after-buy}/after-buy-notification-service:dev
+
+  admin-service:
+    image: ghcr.io/${GITHUB_ORG:-after-buy}/after-buy-admin-service:dev
