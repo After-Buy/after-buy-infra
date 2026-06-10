@@ -1,23 +1,12 @@
 # After Buy Infra
 
-After Buy 서비스의 Docker Compose 및 Nginx 기반 인프라 설정을 관리하는 레포지토리입니다.
+After Buy 서비스의 **Docker Compose 및 Nginx 기반 인프라 설정**을 관리하는 레포지토리입니다.
 
 이 레포지토리는 Auth Service, Device Service, Notification Service, Admin Service를 하나의 Docker 네트워크 안에서 실행하고, Nginx를 통해 외부 요청을 각 서비스로 라우팅하는 역할을 담당합니다.
 
 ---
 
-## Tech Stack
-
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge\&logo=docker\&logoColor=white)
-![Docker Compose](https://img.shields.io/badge/Docker_Compose-2496ED?style=for-the-badge\&logo=docker\&logoColor=white)
-![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge\&logo=nginx\&logoColor=white)
-![GHCR](https://img.shields.io/badge/GitHub_Container_Registry-181717?style=for-the-badge\&logo=github\&logoColor=white)
-![AWS EC2](https://img.shields.io/badge/AWS_EC2-FF9900?style=for-the-badge\&logo=amazonec2\&logoColor=white)
-![Let's Encrypt](https://img.shields.io/badge/Let's_Encrypt-003A70?style=for-the-badge\&logo=letsencrypt\&logoColor=white)
-
----
-
-## Overview
+## 01. Overview
 
 After Buy Infra는 After Buy 백엔드 서비스들의 실행 환경과 프록시 설정을 관리합니다.
 
@@ -35,13 +24,33 @@ Nginx
 
 ---
 
-## Architecture
+## 02. Tech Stack
 
-<img width="1535" height="1024" alt="시스템 아키텍처" src="https://github.com/user-attachments/assets/514e60b5-6e66-4b92-8502-02c4f1cc44c3" />
+### Infra
+
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge\&logo=docker\&logoColor=white)
+![Docker Compose](https://img.shields.io/badge/Docker_Compose-2496ED?style=for-the-badge\&logo=docker\&logoColor=white)
+![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge\&logo=nginx\&logoColor=white)
+
+### Cloud & Deployment
+
+![AWS EC2](https://img.shields.io/badge/AWS_EC2-FF9900?style=for-the-badge\&logo=amazonec2\&logoColor=white)
+![GHCR](https://img.shields.io/badge/GitHub_Container_Registry-181717?style=for-the-badge\&logo=github\&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge\&logo=githubactions\&logoColor=white)
+
+### SSL
+
+![Let's Encrypt](https://img.shields.io/badge/Let's_Encrypt-003A70?style=for-the-badge\&logo=letsencrypt\&logoColor=white)
 
 ---
 
-## Project Structure
+## 03. Architecture
+
+<img width="1535" height="1024" alt="시스템 아키텍처" src="https://github.com/user-attachments/assets/de76273a-bce3-44da-83f7-62a5a8cda0b8" />
+
+---
+
+## 04. Project Structure
 
 ```text
 after-buy-infra
@@ -57,7 +66,7 @@ after-buy-infra
 
 ---
 
-## Compose Files
+## 05. Compose Files
 
 | File                       | Description                                             |
 | -------------------------- | ------------------------------------------------------- |
@@ -69,7 +78,7 @@ after-buy-infra
 
 ---
 
-## Services
+## 06. Services
 
 | Service              | Container              | Port        | Description                           |
 | -------------------- | ---------------------- | ----------- | ------------------------------------- |
@@ -81,7 +90,7 @@ after-buy-infra
 
 ---
 
-## Nginx Routing
+## 07. Nginx Routing
 
 | Path                  | Target Service              |
 | --------------------- | --------------------------- |
@@ -93,7 +102,7 @@ after-buy-infra
 
 ---
 
-## Environment Variables
+## 08. Environment Variables
 
 ### Common
 
@@ -145,7 +154,7 @@ after-buy-infra
 
 ---
 
-## Run
+## 09. Run
 
 ### Development Server
 
@@ -173,7 +182,9 @@ docker compose -f docker-compose.yml -f docker-compose.local.yml up -d
 
 ---
 
-## Stop
+## 10. Stop
+
+전체 컨테이너를 종료합니다.
 
 ```bash
 docker compose down
@@ -187,15 +198,15 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml down
 
 ---
 
-## Logs
+## 11. Logs
 
-전체 컨테이너 로그 확인:
+전체 컨테이너 로그를 확인합니다.
 
 ```bash
 docker compose logs -f
 ```
 
-특정 서비스 로그 확인:
+특정 서비스 로그를 확인합니다.
 
 ```bash
 docker compose logs -f auth-service
@@ -207,13 +218,15 @@ docker compose logs -f nginx
 
 ---
 
-## Restart
+## 12. Restart
+
+전체 컨테이너를 재시작합니다.
 
 ```bash
 docker compose restart
 ```
 
-특정 서비스만 재시작:
+특정 서비스만 재시작합니다.
 
 ```bash
 docker compose restart nginx
@@ -225,7 +238,7 @@ docker compose restart admin-service
 
 ---
 
-## Image Tags
+## 13. Image Tags
 
 | Environment | Image Tag |
 | ----------- | --------- |
@@ -241,7 +254,7 @@ ghcr.io/after-buy/after-buy-auth-service:latest
 
 ---
 
-## SSL
+## 14. SSL
 
 Nginx는 HTTPS 연결을 위해 Let's Encrypt 인증서 경로를 사용합니다.
 
@@ -259,7 +272,7 @@ Certbot 인증서 발급 및 갱신을 위해 아래 경로가 Nginx 컨테이�
 
 ---
 
-## Firebase Config
+## 15. Firebase Config
 
 Notification Service는 FCM 푸시 알림 발송을 위해 Firebase Service Account 파일을 사용합니다.
 
@@ -277,7 +290,7 @@ Notification Service는 FCM 푸시 알림 발송을 위해 Firebase Service Acco
 
 ---
 
-## Network
+## 16. Network
 
 모든 서비스는 동일한 Docker bridge network 안에서 통신합니다.
 
@@ -296,7 +309,7 @@ http://admin-service:8084
 
 ---
 
-## Related Repositories
+## 17. Related Repositories
 
 | Repository                                                                                    | Description             |
 | --------------------------------------------------------------------------------------------- | ----------------------- |
@@ -309,7 +322,7 @@ http://admin-service:8084
 
 ---
 
-## Role in After Buy
+## 18. Role in After Buy
 
 이 레포지토리는 After Buy 백엔드 서비스가 하나의 서버 환경에서 안정적으로 실행될 수 있도록 Docker Compose, Nginx, SSL, 네트워크 설정을 관리합니다.
 
